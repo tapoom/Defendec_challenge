@@ -15,6 +15,6 @@ public class ShortIDGenerator {
      */
     public static String generate(String deviceGUID) {
         // ToDo
-        return "";
+        return "DOIT";
     }
 }
