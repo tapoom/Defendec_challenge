@@ -1,5 +1,6 @@
 package ee.defendec.challenge.shortidchecker.devices;
 
+import ee.defendec.challenge.shortidchecker.setup.GeneralSetup;
 import ee.defendec.challenge.shortidchecker.tools.ShortIDGenerator;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -8,7 +9,7 @@ import java.text.SimpleDateFormat;
 
 public class Camera {
 
-    private static final String DATEFORMAT = "yyyy/MM/dd HH:mm:ss";
+    private static final String DATEFORMAT = GeneralSetup.DATEFORMAT;
 
     private String customerName;
     private String deviceGUID;
