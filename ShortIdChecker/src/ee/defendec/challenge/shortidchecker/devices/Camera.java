@@ -24,15 +24,17 @@ public class Camera {
         this.deviceGUID = deviceGUID;
         this.customerName = "";
         updateLastModified();
+
     }
 
     public Camera( String deviceGUID, String customerName) {
         this.customerName = customerName;
         this.deviceGUID = deviceGUID;
         updateLastModified();
+
     }
 
-    public Camera(String deviceGUID, String customerName, String lastModified) {
+    public Camera(String deviceGUID, String lastModified, String customerName) {
         this.customerName = customerName;
         this.deviceGUID = deviceGUID;
         try {
@@ -41,6 +43,7 @@ public class Camera {
             System.out.println(exception);
             System.out.println("Bad date, will write current time as last modified time stamp.");
             updateLastModified();
+
         }
     }
 
@@ -55,6 +58,7 @@ public class Camera {
     public void updateCustomerName(String newCustomerName) {
         customerName = newCustomerName;
         updateLastModified();
+
     }
 
     public String getDeviceGUID() {
@@ -62,8 +66,7 @@ public class Camera {
     }
 
     public String getLastModifiedString() {
-        DateFormat dateFormat = new SimpleDateFormat(DATEFORMAT);
-        return dateFormat.format(lastModified);
+        return lastModified.toString();
     }
 
     public Date getLastModifiedDateTime() {
