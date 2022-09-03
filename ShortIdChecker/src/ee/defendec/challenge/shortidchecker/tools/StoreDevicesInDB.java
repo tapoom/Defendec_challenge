@@ -6,12 +6,13 @@ import ee.defendec.challenge.shortidchecker.exceptions.FileWriterException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class StoreDevicesInDB {
 
-    private static List<String> listOfDeviceData;
+    private static List<String> listOfDeviceData = new ArrayList<>();
 
     public static boolean storeDevices(HashMap<String, Camera> mapOfDevices, String filename) {
         for (String shortID : mapOfDevices.keySet()) {

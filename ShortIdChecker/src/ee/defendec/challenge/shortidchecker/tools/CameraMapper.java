@@ -49,6 +49,7 @@ public class CameraMapper {
             }
         }
         for (Camera camera : listOfCameras) {
+            camera.setInExternalDB();
             mapOfCameras.put(camera.getShortID(), camera);
         }
         return mapOfCameras;

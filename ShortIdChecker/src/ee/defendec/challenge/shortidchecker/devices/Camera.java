@@ -13,8 +13,8 @@ public class Camera {
 
     private String customerName;
     private String deviceGUID;
-    private Date lastModified;  // What does this mean exactly, is it the last time the data was synced?
-    // Do we need to update it every time we sync?
+    private Date lastModified;
+    private boolean inExternalDB;
 
     /**
      * Create a camera object.
@@ -61,17 +61,34 @@ public class Camera {
         return deviceGUID;
     }
 
-    public String getLastModified() {
+    public String getLastModifiedString() {
         DateFormat dateFormat = new SimpleDateFormat(DATEFORMAT);
         return dateFormat.format(lastModified);
+    }
+
+    public Date getLastModifiedDateTime() {
+        return lastModified;
     }
 
     private void updateLastModified() {
         lastModified = new Date();
     }
 
+    public void setInExternalDB() {
+        inExternalDB = true;
+    }
+
     @Override
     public String toString() {
-        return deviceGUID + " " + customerName + " " + lastModified;
+        return deviceGUID + "," + lastModified + "," + customerName;
+    }
+
+    public String getStringData() {
+        return "[{\n" +
+                "\'guid\':" + deviceGUID + ",\n" +
+                "\'seen\':" + getLastModifiedString() + ",\n" +
+                "\'customer\':" + customerName + ",\n" +
+                "\'external\':" + inExternalDB + ",\n" +
+                "],";
     }
 }

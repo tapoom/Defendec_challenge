@@ -19,7 +19,7 @@ public class GetDevicesFromDB {
         try (Stream<String> linesStream = Files.lines(path)) {
             linesStream.forEach(s -> dataByLine.addAll(Arrays.asList(s.split("\\\\n"))));
             for (String line : dataByLine) {
-                devices.add(Arrays.asList(line.split(" ")));
+                devices.add(Arrays.asList(line.split(",")));
             }
         } catch (IOException e) {
             throw new FileReaderException("No such file", e);
