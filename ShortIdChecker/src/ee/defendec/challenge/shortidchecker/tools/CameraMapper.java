@@ -7,25 +7,27 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-public class CreateCameras {
+public class CameraMapper {
 
     private static final String DATEFORMAT = GeneralSetup.DATEFORMAT;
-    private List<Camera> listOfCameras = new ArrayList<>();
-    private String lastModified;
-    private DateFormat dateFormat = new SimpleDateFormat(DATEFORMAT);
-    private String blankName;
+    private static List<Camera> listOfCameras = new ArrayList<>();
+    private static String lastModified;
+    private static DateFormat dateFormat = new SimpleDateFormat(DATEFORMAT);
+    private static String blankName;
+    private static HashMap<String, Camera> mapOfCameras = new HashMap<>();
 
-    public List<Camera> MakeCameras(List<List<String>> dataFromDB) {
+    public static HashMap<String, Camera> getCameraMap(String fileLocation) {
 
-        for (List<String> data : dataFromDB) {
+        for (List<String> data : GetDevicesFromDB.getDeviceListFromDatabase(fileLocation)) {
             // Data in database always has the ID, so we can assume that if we have only one element stored,
             // it will be the GUID. The second element should be the name, but the name is optional.
             // We need to check element 2 if it is a name or a time. If the format fits the required datetime format,
             // then we know it is not the name.
 
-            // Since we create the data, we know that the data is in sequence GUID -> Name -> DateTime
+            // Since we create the data, we know that the data is in sequence GUID -> DateTime -> Name
             // Exception is that either DateTime or Name might not be presented in the data.
 
             // ToDo Should create a builder for the Camera object.
@@ -45,8 +47,10 @@ public class CreateCameras {
                 // Data has 3 elements, so we can create the full Camera object.
                 listOfCameras.add(new Camera(data.get(0), data.get(1), data.get(2)));
             }
-            return listOfCameras;
         }
-        return null;
+        for (Camera camera : listOfCameras) {
+            mapOfCameras.put(camera.getShortID(), camera);
+        }
+        return mapOfCameras;
     }
 }

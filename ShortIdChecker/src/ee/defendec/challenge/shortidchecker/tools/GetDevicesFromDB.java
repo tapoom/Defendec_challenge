@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 
 public class GetDevicesFromDB {
 
-    public List<List<String>> readTextFromFile(String filename) {
-        Path path = Paths.get(filename);
+    public static List<List<String>> getDeviceListFromDatabase(String fileLocation) {
+        Path path = Paths.get(fileLocation);
         List<String> dataByLine = new ArrayList<>();
         List<List<String>> devices = new ArrayList<>();
         try (Stream<String> linesStream = Files.lines(path)) {
@@ -21,9 +21,9 @@ public class GetDevicesFromDB {
             for (String line : dataByLine) {
                 devices.add(Arrays.asList(line.split(" ")));
             }
-            return devices;
         } catch (IOException e) {
             throw new FileReaderException("No such file", e);
         }
+        return devices;
     }
 }

@@ -1,8 +1,5 @@
 package ee.defendec.challenge.shortidchecker.tools;
 
-import java.util.HexFormat;
-// import javax.xml.bind.DatatypeConverter;
-
 public class ShortIDGenerator {
 
     /**
@@ -17,34 +14,8 @@ public class ShortIDGenerator {
      * @return short GUID
      */
     public static String generate(String deviceGUID) {
-        // ToDo
-        int len = deviceGUID.length();
-        byte[] data = new byte[len / 2];
-        // Iterate over the string array by 2 and store all presented Bytes
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(deviceGUID.charAt(i), 16) << 4)
-                    + Character.digit(deviceGUID.charAt(i+1), 16));
-        }
-
-        System.out.println(data);
-        System.out.println(data[0]);
-        System.out.println(data[1]);
-        System.out.println(data[2]);
-        System.out.println(data[3]);
-        System.out.println(data[4]);
-        System.out.println(data[5]);
-        System.out.println(data[6]);
-        System.out.println(data[7]);
-        System.out.println(data[1] + data[2]);
-
-        for (int i = 0; i < len; i += 2) {for (int i = 0; i < len; i += 2) {for (int i = 0 < len; i +=2)
-        // System.out.println("oneliner");
-        // System.out.println(DatatypeConverter.parseHexBinary(deviceGUID));
-        return "DOIT";
-    }
-
-    public static void main(String[] args) {
-        ShortIDGenerator.generate("018A23EA19000038");
-        // ShortIDGenerator.generate("018A23EA19000038");
+        // Not 100% sure but little-endian should essentially mean in the same order, not reversed.
+        // Look into it further, and study the Hex data
+        return deviceGUID.substring(2,6);
     }
 }

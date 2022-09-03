@@ -6,7 +6,15 @@ import java.util.HashMap;
 
 public class API {
 
-    private HashMap<String, Camera> localDevices = new HashMap<>();
+
+
+    private HashMap<String, Camera> localDBDevicesMap = new HashMap<>();
+    private HashMap<String, Camera> externalDBDevicesMap = new HashMap<>();
+
+
+
+
+
 
 
 }

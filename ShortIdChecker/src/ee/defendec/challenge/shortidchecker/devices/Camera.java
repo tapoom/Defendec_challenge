@@ -52,6 +52,11 @@ public class Camera {
         return customerName;
     }
 
+    public void updateCustomerName(String newCustomerName) {
+        customerName = newCustomerName;
+        updateLastModified();
+    }
+
     public String getDeviceGUID() {
         return deviceGUID;
     }
@@ -61,7 +66,12 @@ public class Camera {
         return dateFormat.format(lastModified);
     }
 
-    public void updateLastModified() {
+    private void updateLastModified() {
         lastModified = new Date();
+    }
+
+    @Override
+    public String toString() {
+        return deviceGUID + " " + customerName + " " + lastModified;
     }
 }
