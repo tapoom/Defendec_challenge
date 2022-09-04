@@ -10,7 +10,7 @@ public class ShortIDChecker {
      * @param GUID
      * @return
      */
-    public static boolean checkShortID(String GUID) {
+    public static boolean checkShortID(String GUID) throws ShortIDException {
         String shortID = ShortIDGenerator.generate(GUID);
         if (SyncWorker.getLocalDBDevicesMap().containsKey(shortID)) {
             throw new ShortIDException(GUID, SyncWorker.getLocalDBDevicesMap().get(shortID));

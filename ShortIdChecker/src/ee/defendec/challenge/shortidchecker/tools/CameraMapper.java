@@ -7,7 +7,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class CameraMapper {
         }
         for (Camera camera : listOfCameras) {
             camera.setInExternalDB();
-            mapOfCameras.put(camera.getShortID(), camera);
+            mapOfCameras.put(camera.getDeviceGUID(), camera);
         }
         return mapOfCameras;
     }

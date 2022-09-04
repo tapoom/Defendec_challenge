@@ -2,7 +2,6 @@ package ee.defendec.challenge.shortidchecker.devices;
 
 import ee.defendec.challenge.shortidchecker.setup.GeneralSetup;
 import ee.defendec.challenge.shortidchecker.tools.ShortIDGenerator;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -24,7 +23,6 @@ public class Camera {
         this.deviceGUID = deviceGUID;
         this.customerName = "";
         updateLastModified();
-
     }
 
     public Camera( String deviceGUID, String customerName) {
@@ -73,7 +71,7 @@ public class Camera {
         return lastModified;
     }
 
-    private void updateLastModified() {
+    public void updateLastModified() {
         lastModified = new Date();
     }
 
@@ -83,15 +81,15 @@ public class Camera {
 
     @Override
     public String toString() {
-        return deviceGUID + "," + lastModified + "," + customerName;
+        return deviceGUID + ", " + lastModified + ", " + customerName;
     }
 
     public String getStringData() {
         return "[{\n" +
-                "\'guid\':" + deviceGUID + ",\n" +
-                "\'seen\':" + getLastModifiedString() + ",\n" +
-                "\'customer\':" + customerName + ",\n" +
-                "\'external\':" + inExternalDB + ",\n" +
+                "\'guid\': '" + deviceGUID + "',\n" +
+                "\'seen\': '" + getLastModifiedString() + "',\n" +
+                "\'customer\': '" + customerName + "',\n" +
+                "\'external\': " + inExternalDB + ",\n" +
                 "],";
     }
 }

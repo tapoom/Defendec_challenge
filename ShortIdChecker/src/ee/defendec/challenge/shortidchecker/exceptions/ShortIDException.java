@@ -1,17 +1,14 @@
 package ee.defendec.challenge.shortidchecker.exceptions;
 
 import ee.defendec.challenge.shortidchecker.devices.Camera;
+import ee.defendec.challenge.shortidchecker.tools.ShortIDGenerator;
 
-public class ShortIDException extends RuntimeException {
+public class ShortIDException extends Throwable {
 
-    /**
-     *
-     * @param providedGUID
-     * @param camera
-     */
-    public ShortIDException(String providedGUID, Camera camera) {
-        String message = "{\n" + "\'providedGUID\\':" + providedGUID + ",\n"+
-                "\'conflictingWithGUIDS\':" + camera.getStringData() +
-                "\n}";
+    public ShortIDException(String guid, Camera conflictedCamera) {
+        super("{\n" + "\'providedGUID\\':" + guid + ",\n" +
+                "\'conflictingWithGUIDS\':" +
+                conflictedCamera.getStringData() +
+                "\n}");
     }
 }

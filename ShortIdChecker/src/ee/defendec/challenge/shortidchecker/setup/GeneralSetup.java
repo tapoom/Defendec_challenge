@@ -16,7 +16,4 @@ public class GeneralSetup {
     public static final String EXTERNAL_DB_LOCATION_WIN = PATH_TO_REPO + FILE_PATH_IN_REPO_WIN + EXTERNAL_DB_NAME;
     public static final String EXTERNAL_DB_LOCATION_MAC = PATH_TO_REPO + FILE_PATH_IN_REPO_MAC + EXTERNAL_DB_NAME;
 
-    public static final String LOCAL_DB_LOCATION = "C:\\Users\\Tanel\\IdeaProjects" +
-            "\\Defendec_challenge\\ShortIdChecker\\src\\ee\\defendec\\challenge\\shortidchecker" +
-            "\\internalstorage\\localDB";
 }
