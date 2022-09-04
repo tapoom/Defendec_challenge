@@ -5,7 +5,6 @@ import ee.defendec.challenge.shortidchecker.devices.Camera;
 import ee.defendec.challenge.shortidchecker.exceptions.BadGUIDException;
 import ee.defendec.challenge.shortidchecker.exceptions.ShortIDException;
 import ee.defendec.challenge.shortidchecker.tools.ShortIDChecker;
-import ee.defendec.challenge.shortidchecker.tools.ShortIDGenerator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,21 +32,23 @@ public class API {
         return SyncWorker.getLocalDBDevicesMap();
     }
 
-    public boolean addCamera(String GUID) {
+    // ToDo after adding we should do a post from the API?
+    public void addCamera(String GUID) {
+        Camera newCamera = new Camera(GUID);
         try {
             checkGUIDLength(GUID);
             try {
-                ShortIDChecker.checkShortID(GUID);
-                getLocalDBDevicesMap().put(ShortIDGenerator.generate(GUID), new Camera(GUID));
-                return true;
+                ShortIDChecker.checkShortIDsAndUpdateLocalDB(newCamera);
+                getLocalDBDevicesMap().put(newCamera.getGUID(), newCamera);
+                if (!newCamera.getConflictedCameras().isEmpty()) {
+                    throw new ShortIDException(GUID, newCamera.getConflictedGUIDsString());
+                }
             } catch (ShortIDException message) {
                 System.out.println(message);
-                return false;
             }
         } catch (BadGUIDException badGUIDMessage) {
             System.out.println(badGUIDMessage);
         }
-        return false;
     }
 
     public boolean updateCameraName(String shortID, String newName) {

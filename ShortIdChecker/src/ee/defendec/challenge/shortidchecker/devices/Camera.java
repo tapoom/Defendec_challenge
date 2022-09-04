@@ -3,8 +3,10 @@ package ee.defendec.challenge.shortidchecker.devices;
 import ee.defendec.challenge.shortidchecker.setup.GeneralSetup;
 import ee.defendec.challenge.shortidchecker.tools.ShortIDGenerator;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class Camera {
 
@@ -14,6 +16,7 @@ public class Camera {
     private String deviceGUID;
     private Date lastModified;
     private boolean inExternalDB;
+    private List<Camera> conflictedCameras = new ArrayList<>();
 
     /**
      * Create a camera object.
@@ -59,11 +62,14 @@ public class Camera {
 
     }
 
-    public String getDeviceGUID() {
+    public String getGUID() {
         return deviceGUID;
     }
 
     public String getLastModifiedString() {
+        if (lastModified == null) {
+            return "";
+        }
         return lastModified.toString();
     }
 
@@ -81,15 +87,40 @@ public class Camera {
 
     @Override
     public String toString() {
+        return "[{\n" +
+                "'guid': '" + deviceGUID + "',\n" +
+                "'conflictsWithGUIDs': " + "[\n" + getConflictedGUIDsString() + "\n" +
+                "'seen': '" + getLastModifiedString() + "',\n" +
+                "'customer': '" + customerName + "',\n" +
+                "'external': " + inExternalDB + ",\n";
+    }
+
+
+    public String getConflictedGUIDsString() {
+        String conflictedGUIDsString = "";
+        for (Camera conflictedCamera : conflictedCameras) {
+            conflictedGUIDsString = conflictedGUIDsString.concat(conflictedCamera.getPostWithoutConflicts() + "\n");
+        }
+        return conflictedGUIDsString.trim() + "\n],";
+    }
+
+    public String getStoringStringForDB() {
         return deviceGUID + ", " + lastModified + ", " + customerName;
     }
 
-    public String getStringData() {
-        return "[{\n" +
-                "\'guid\': '" + deviceGUID + "',\n" +
-                "\'seen\': '" + getLastModifiedString() + "',\n" +
-                "\'customer\': '" + customerName + "',\n" +
-                "\'external\': " + inExternalDB + ",\n" +
-                "],";
+    public String getPostWithoutConflicts() {
+        return  "'guid': '" + deviceGUID + "'," +
+                "'seen': '" + getLastModifiedString() + "'," + "'customer': '" +
+                customerName + "'," + "'external': " + inExternalDB + ",";
     }
+
+    public void addConflictedGUID(Camera conflictedCamera) {
+        conflictedCameras.add(conflictedCamera);
+    }
+
+    public List<Camera> getConflictedCameras() {
+        return conflictedCameras;
+    }
+
+
 }

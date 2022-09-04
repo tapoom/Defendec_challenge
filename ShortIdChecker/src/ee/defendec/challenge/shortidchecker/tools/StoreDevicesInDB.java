@@ -15,8 +15,8 @@ public class StoreDevicesInDB {
     private static List<String> listOfDeviceData = new ArrayList<>();
 
     public static boolean storeDevices(HashMap<String, Camera> mapOfDevices, String filename) {
-        for (String shortID : mapOfDevices.keySet()) {
-            listOfDeviceData.add(mapOfDevices.get(shortID).toString());
+        for (String GUID : mapOfDevices.keySet()) {
+            listOfDeviceData.add(mapOfDevices.get(GUID).getStoringStringForDB());
         }
         return writeLinesToFile(listOfDeviceData, filename);
     }

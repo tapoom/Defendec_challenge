@@ -15,9 +15,21 @@ public class main {
 
         api.addCamera("4324234234323456");
         api.addCamera("4324234234323457");
+
         api.addCamera("EAD5E2649FCB779A");
 
+        api.addCamera("4324234234323458");
+
+        System.out.println(api.getLocalDBDevicesMap().get("4324234234323458"));
+        /*
+        api.addCamera("4324234234323459");
+        api.addCamera("EAD5E2649FCB779A");
+        System.out.println(api.getLocalDBDevicesMap().get("EAD5E2649FCB779A"));
         api.run();
+
+         */
+
+
         /*
         for (String shortID : api.getLocalDBDevicesMap().keySet()) {
             System.out.println(api.getLocalDBDevicesMap().get(shortID).getStringData());
