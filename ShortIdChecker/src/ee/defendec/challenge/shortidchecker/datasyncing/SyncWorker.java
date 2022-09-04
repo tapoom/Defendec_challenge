@@ -9,21 +9,29 @@ import java.util.HashMap;
 
 public class SyncWorker {
 
-    private static final String EXTERNAL_DB_LOCATION = GeneralSetup.EXTERNAL_DB_LOCATION;
     private static HashMap<String, Camera> localDBDevicesMap = new HashMap<>();
+
+    private static String getDatabaseLocation() {
+        String os = System.getProperty("os.name");
+        if (os.startsWith("Windows")) {
+            return GeneralSetup.EXTERNAL_DB_LOCATION_WIN;
+        }
+        return GeneralSetup.EXTERNAL_DB_LOCATION_MAC;
+    }
 
     /**
      * Gets the stored data and writes it into map of cameras
      */
     private static HashMap<String, Camera> fetchExternalDevices() {
-        return CameraMapper.getCameraMap(EXTERNAL_DB_LOCATION);
+        return CameraMapper.getCameraMap(getDatabaseLocation());
+
     }
 
     /**
      * Write external data to text DB
      */
     private static void storeDevicesInExternalDB(HashMap<String, Camera> devicesMap) {
-        StoreDevicesInDB.storeDevices(devicesMap, EXTERNAL_DB_LOCATION);
+        StoreDevicesInDB.storeDevices(devicesMap, getDatabaseLocation());
     }
 
     public static HashMap<String, Camera> getLocalDBDevicesMap() {
