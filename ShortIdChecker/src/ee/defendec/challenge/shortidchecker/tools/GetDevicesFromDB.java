@@ -12,9 +12,8 @@ import java.util.stream.Stream;
 
 public class GetDevicesFromDB {
 
-    public static List<List<String>> getDeviceListFromDatabase(String fileLocation) {
+    public List<List<String>> getDeviceListFromDatabase(String fileLocation) {
         Path path = Paths.get(fileLocation);
-        System.out.println(path);
         List<String> dataByLine = new ArrayList<>();
         List<List<String>> devices = new ArrayList<>();
         try (Stream<String> linesStream = Files.lines(path)) {

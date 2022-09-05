@@ -2,84 +2,46 @@ package ee.defendec.challenge.shortidchecker.main;
 
 import ee.defendec.challenge.shortidchecker.API.API;
 import ee.defendec.challenge.shortidchecker.datasyncing.SyncWorker;
-import ee.defendec.challenge.shortidchecker.exceptions.ShortIDException;
-
-import java.text.ParseException;
-
 
 public class main {
-    public static void main(String[] args) throws ParseException, ShortIDException {
+    public static void main(String[] args) {
 
         SyncWorker.INSTANCE.start();
         API api = new API();
 
-        api.addCamera("4324234234323456");
-        api.addCamera("4324234234323457");
-
-        api.addCamera("EAD5E2649FCB779A");
-
-        api.addCamera("4324234234323458");
-
-        System.out.println(api.getLocalDBDevicesMap().get("4324234234323458"));
-        /*
-        api.addCamera("4324234234323459");
-        api.addCamera("EAD5E2649FCB779A");
-        System.out.println(api.getLocalDBDevicesMap().get("EAD5E2649FCB779A"));
-        api.run();
-
-         */
-
-
-        /*
-        for (String shortID : api.getLocalDBDevicesMap().keySet()) {
-            System.out.println(api.getLocalDBDevicesMap().get(shortID).getStringData());
-        }
-        // EAD5E2649FCB779A,Thu Sep 01 13:56:37 EEST 2022,G4S site Alpha
-        SyncWorker.update();
-        for (String shortID : api.getLocalDBDevicesMap().keySet()) {
-            System.out.println(api.getLocalDBDevicesMap().get(shortID).getStringData());
+        api.doPostForTestingInternal("01DABAFOODFOODFO");
+        api.doPostForTestingInternal("01DADAFOODFOODFO");
+        api.doPostForTestingInternal("EAD5E2649FCB779A");
+        api.doPostForTestingInternal("01BABAFOODFOODFO");
+        api.doPostForTestingInternal("01BABACAFECAFECA");
+        api.doPostForTestingInternal("01VABACAFECAFECA");
+        api.doPostForTestingInternal("01VAVACAFECAFECA");
+        api.doPostForTestingInternal("01VABACAKECAKECA");
+        api.doPostForTestingInternal("01VABACAKECAKECAKE");
+        api.doPostForTestingInternal("01VARACAKECAKECA");
+        api.doPostForTestingInternal("C69DA9CEE58D8A7D");
+        System.out.println("Customer name: " + api.getLocalDBDevicesMap().get("C69DA9CEE58D8A7D").getCustomerName());
+        long pastTime = System.nanoTime();
+        long updateAfter = 500000000;
+        boolean updated = false;
+        while (!updated) {
+            if (pastTime + updateAfter < System.nanoTime()) {
+                System.out.println("Should be prisma after updating");
+                api.doPostForTestingInternal("C69DA9CEE58D8A7D");
+                updated = true;
+            }
         }
 
-        for (String shortID : SyncWorker.getLocalDBDevicesMap().keySet()) {
-            System.out.println(SyncWorker.getExternalDBMap().get(shortID).getStringData());
-        }
+        api.doPostForTestingInternal("01DABAFOODFOODFO");
+        api.doPostForTestingInternal("01DADAFOODFOODFO");
+        api.doPostForTestingInternal("EAD5E2649FCB779A");
+        api.doPostForTestingInternal("01BABAFOODFOODFO");
+        api.doPostForTestingInternal("01BABACAFECAFECA");
+        api.doPostForTestingInternal("01VABACAFECAFECA");
+        api.doPostForTestingInternal("01VAVACAFECAFECA");
+        api.doPostForTestingInternal("01VABACAKECAKECA");
+        api.doPostForTestingInternal("01VARACAKECAKECA");
+        api.doPostForTestingInternal("C69DA9CEE58D8A7D");
 
-        api.updateCameraName("2423", "Tanel");
-
-
-        System.out.println(api.getLocalDBDevicesMap().get("2423").getStringData());
-
-        System.out.println(SyncWorker.getExternalDBMap().get("2423").getStringData());
-
-        SyncWorker.update();
-
-        System.out.println(SyncWorker.getExternalDBMap().get("2423").getStringData());
-
-        System.out.println("Print out external DB map: " + SyncWorker.getExternalDBMap());
-
-        for (String shortID : SyncWorker.getExternalDBMap().keySet()) {
-            System.out.println(SyncWorker.getExternalDBMap().get(shortID).getStringData());
-        }
-
-         */
-
-
-
-
-
-
-/*
-        Date date = new Date();
-
-        System.out.println("Stored date: " + date);
-        String stringDate = date.toString();
-        System.out.println("Stored date to String: " + stringDate);
-        SimpleDateFormat formatter =  new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy");
-        Date formattedDate = formatter.parse(stringDate);
-        System.out.println("formatted date: " + formattedDate);
-        //DateFormat dateFormat = new SimpleDateFormat(GeneralSetup.DATEFORMAT);
-        //System.out.println(new SimpleDateFormat(GeneralSetup.DATEFORMAT).parse(new Date().toString()));
-
-         */
     }
 }

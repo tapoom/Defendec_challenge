@@ -6,49 +6,17 @@ import ee.defendec.challenge.shortidchecker.exceptions.BadGUIDException;
 import ee.defendec.challenge.shortidchecker.exceptions.ShortIDException;
 import ee.defendec.challenge.shortidchecker.tools.ShortIDChecker;
 
-import java.io.BufferedReader;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 
-public class API {
-
-    public void run() {
-        while (true) {
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(System.in));
-            // Reading data using readLine
-            try {
-                String name = reader.readLine();
-                // Printing the read line
-                System.out.println(name);
-            } catch (IOException s) {
-                System.out.println(s);
-            }
-        }
-    }
+public class API extends HttpServlet {
 
     public HashMap<String, Camera> getLocalDBDevicesMap() {
         return SyncWorker.getLocalDBDevicesMap();
-    }
-
-    // ToDo after adding we should do a post from the API?
-    public void addCamera(String GUID) {
-        Camera newCamera = new Camera(GUID);
-        try {
-            checkGUIDLength(GUID);
-            try {
-                ShortIDChecker.checkShortIDsAndUpdateLocalDB(newCamera);
-                getLocalDBDevicesMap().put(newCamera.getGUID(), newCamera);
-                if (!newCamera.getConflictedCameras().isEmpty()) {
-                    throw new ShortIDException(GUID, newCamera.getConflictedGUIDsString());
-                }
-            } catch (ShortIDException message) {
-                System.out.println(message);
-            }
-        } catch (BadGUIDException badGUIDMessage) {
-            System.out.println(badGUIDMessage);
-        }
     }
 
     public boolean updateCameraName(String shortID, String newName) {
@@ -66,9 +34,103 @@ public class API {
         return true;
     }
 
-    public void deleteDeviceFromLocalDB(String shortID) {
-        SyncWorker.getLocalDBDevicesMap().remove(shortID);
+    public void deleteDeviceFromLocalDB(String GUID) {
+        SyncWorker.getLocalDBDevicesMap().remove(GUID);
     }
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String GUID = request.getParameter("device");
+        if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
+            response.getOutputStream().println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
+        } else {
+            response.getOutputStream().println("{}");
+        }
+    }
 
+    /**
+     *
+     * @param GUID
+     * @return
+     */
+    public void doGetForTestingInternal(String GUID) {
+        try {
+            checkGUIDLength(GUID);
+            if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
+                System.out.println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
+            } else {
+                System.out.println("{}");
+            }
+        } catch (BadGUIDException badGUIDMessage) {
+            System.out.println(badGUIDMessage);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String GUID = request.getParameter("device");
+        // Seems from the test example that we need to add a device even if it already exists in the local DB
+        // I will not do this at the moment since it seems redundant.
+        if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
+            response.getOutputStream().println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
+        } else {
+            Camera newCamera = new Camera(GUID);
+            try {
+                checkGUIDLength(GUID);
+                try {
+                    ShortIDChecker.checkShortIDsAndUpdateLocalDB(newCamera);
+                    getLocalDBDevicesMap().put(newCamera.getGUID(), newCamera);
+                    if (!newCamera.getConflictedCameras().isEmpty()) {
+                        throw new ShortIDException(GUID, newCamera.getConflictedGUIDsString());
+                    }
+                    response.getOutputStream().println(newCamera.getPostMessage());
+                } catch (ShortIDException message) {
+                    response.getOutputStream().println(message.toString());
+                }
+            } catch (BadGUIDException badGUIDMessage) {
+                response.getOutputStream().println(badGUIDMessage.toString());
+            }
+        }
+    }
+
+    /**
+     *
+     * @param GUID
+     */
+    public void doPostForTestingInternal(String GUID) {
+        if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
+            System.out.println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
+        } else {
+            Camera newCamera = new Camera(GUID);
+            try {
+                checkGUIDLength(GUID);
+                try {
+                    ShortIDChecker.checkShortIDsAndUpdateLocalDB(newCamera);
+                    getLocalDBDevicesMap().put(newCamera.getGUID(), newCamera);
+                    if (!newCamera.getConflictedCameras().isEmpty()) {
+                        throw new ShortIDException(GUID, newCamera.getConflictedGUIDsString());
+                    }
+                    System.out.println(newCamera.getPostMessage());
+                } catch (ShortIDException message) {
+                    System.out.println(message);
+                }
+            } catch (BadGUIDException badGUIDMessage) {
+                System.out.println(badGUIDMessage);
+            }
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Not requested at this moment
+        super.doPut(request, response);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Not requested at this moment
+        super.doDelete(request, response);
+    }
 }

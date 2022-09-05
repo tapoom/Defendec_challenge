@@ -58,7 +58,8 @@ public class SyncWorker implements Runnable{
      *
      * When the local database is synced to the external database, sync the external database to the local database.
      */
-    public static void update() {
+    private static void update() {
+        System.out.println("Updating DBs");
         fetchExternalDevices();
         for (String shortIDinLocal : localDBDevicesMap.keySet()) {
             Camera localDBCamera = localDBDevicesMap.get(shortIDinLocal);
@@ -78,9 +79,13 @@ public class SyncWorker implements Runnable{
                 } else if (localDBCamera.getCustomerName().isBlank() && !externalDBCamera.getCustomerName().isBlank()) {
                     externalDBCamera.updateLastModified();
                     localDBDevicesMap.replace(shortIDinLocal, externalDBCamera);
-                } else {
+                    System.out.println("<!-- Customer name of " + externalDBCamera.getGUID() +
+                            " updated in LOCAL DB to " + externalDBCamera.getCustomerName() + " -->");
+                } else if (!localDBCamera.getCustomerName().isBlank() && externalDBCamera.getCustomerName().isBlank()) {
                     localDBCamera.updateLastModified();
                     externalDBDeviceMap.replace(shortIDinLocal, localDBCamera);
+                    System.out.println("<!-- Customer name of " + localDBCamera.getGUID() +
+                            " updated in EXTERNAL DB to " + localDBCamera.getCustomerName() + " -->");
                 }
             } else {
                 // Camera did not exist in the external storage
@@ -89,6 +94,7 @@ public class SyncWorker implements Runnable{
             }
         }
         storeDevicesInExternalDB(externalDBDeviceMap);
+        System.out.println("DBs updated");
     }
 
     public static HashMap<String, Camera> getExternalDBMap() {

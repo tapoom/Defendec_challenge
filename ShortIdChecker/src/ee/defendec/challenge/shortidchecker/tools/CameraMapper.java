@@ -20,7 +20,7 @@ public class CameraMapper {
 
     public static HashMap<String, Camera> getCameraMap(String fileLocation) {
 
-        for (List<String> data : GetDevicesFromDB.getDeviceListFromDatabase(fileLocation)) {
+        for (List<String> data :  new GetDevicesFromDB().getDeviceListFromDatabase(fileLocation)) {
             // Data in database always has the ID, so we can assume that if we have only one element stored,
             // it will be the GUID. The second element should be the name, but the name is optional.
             // We need to check element 2 if it is a name or a time. If the format fits the required datetime format,

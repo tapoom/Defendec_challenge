@@ -15,6 +15,7 @@ public class StoreDevicesInDB {
     private static List<String> listOfDeviceData = new ArrayList<>();
 
     public static boolean storeDevices(HashMap<String, Camera> mapOfDevices, String filename) {
+        listOfDeviceData.clear();
         for (String GUID : mapOfDevices.keySet()) {
             listOfDeviceData.add(mapOfDevices.get(GUID).getStoringStringForDB());
         }
@@ -33,7 +34,10 @@ public class StoreDevicesInDB {
         try {
             if (filename != null) {
                 new File(filename);
-                FileWriter myWriter = new FileWriter(filename);
+                // A little dangerous because we will empty the file and not append.
+                // Meaning data can get lost on failure.
+                // ToDo learn a better way to store data. SQL DB?
+                FileWriter myWriter = new FileWriter(filename, false);
                 for (String line : lines) {
                     myWriter.write(line + "\n");
                 }
