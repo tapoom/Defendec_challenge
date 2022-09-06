@@ -3,7 +3,7 @@ package ee.defendec.challenge.shortidchecker.main;
 import ee.defendec.challenge.shortidchecker.API.API;
 import ee.defendec.challenge.shortidchecker.datasyncing.SyncWorker;
 
-public class main {
+public class Main {
     public static void main(String[] args) {
 
         SyncWorker.INSTANCE.start(20,false);
