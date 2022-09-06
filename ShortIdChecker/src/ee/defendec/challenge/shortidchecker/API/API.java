@@ -12,17 +12,69 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class API extends HttpServlet {
+
+    /**
+     * /POST/GUID - Post the GUID into the local DB
+     * /GET/GUID - Get the GUID info in local DB
+     * /DELETE/GUID - Deletes the GUID from local DB
+     * /UPDATE/GUID => "name" - Updates the name of the camera owner in local DB.
+     *
+     */
+    public void runConsoleInterface() {
+        boolean running = true;
+        while (running) {
+            System.out.println("Command: ");
+            Scanner scanner = new Scanner(System.in);
+            String inputString = scanner.nextLine();
+            if (inputString.startsWith("/POST/")) {
+                String GUID = inputString.replaceFirst("/POST/", "");
+                if (GUID.isBlank()) {
+                    System.out.println("Enter GUID: ");
+                    GUID = scanner.nextLine();
+                }
+                doPostForTestingInternal(GUID);
+            } else if (inputString.startsWith("/GET/")) {
+                String GUID = inputString.replaceFirst("/GET/", "");
+                doGetForTestingInternal(GUID);
+            } else if (inputString.startsWith("/DELETE/")) {
+                String GUID = inputString.replaceFirst("/DELETE/", "");
+                if (GUID.isBlank()) {
+                    System.out.println("Enter GUID: ");
+                    GUID = scanner.nextLine();
+                }
+                deleteDeviceFromLocalDB(GUID);
+                doGetForTestingInternal(GUID);
+            } else if (inputString.startsWith("/UPDATE/")) {
+                String GUID = inputString.replaceFirst("/UPDATE/", "");
+                if (GUID.isBlank()) {
+                    System.out.println("Enter GUID: ");
+                    GUID = scanner.nextLine();
+                }
+                System.out.println("Enter new name: ");
+                String name = scanner.nextLine();
+                updateCameraName(GUID, name);
+                doGetForTestingInternal(GUID);
+            }
+        }
+    }
+
 
     public HashMap<String, Camera> getLocalDBDevicesMap() {
         return SyncWorker.getLocalDBDevicesMap();
     }
 
-    public boolean updateCameraName(String shortID, String newName) {
-        if (getLocalDBDevicesMap().containsKey(shortID)) {
-            getLocalDBDevicesMap().get(shortID).updateCustomerName(newName);
-            return true;
+    public boolean updateCameraName(String GUID, String newName) {
+        try {
+            checkGUIDLength(GUID);
+            if (getLocalDBDevicesMap().containsKey(GUID)) {
+                getLocalDBDevicesMap().get(GUID).updateCustomerName(newName);
+                return true;
+            }
+        } catch (BadGUIDException badGUIDMessage) {
+            System.out.println(badGUIDMessage);
         }
         return false;
     }

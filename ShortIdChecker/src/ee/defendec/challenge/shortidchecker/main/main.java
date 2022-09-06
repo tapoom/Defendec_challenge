@@ -6,7 +6,7 @@ import ee.defendec.challenge.shortidchecker.datasyncing.SyncWorker;
 public class main {
     public static void main(String[] args) {
 
-        SyncWorker.INSTANCE.start();
+        SyncWorker.INSTANCE.start(20,false);
         API api = new API();
 
         api.doPostForTestingInternal("01DABAFOODFOODFO");
@@ -42,6 +42,15 @@ public class main {
         api.doPostForTestingInternal("01VABACAKECAKECA");
         api.doPostForTestingInternal("01VARACAKECAKECA");
         api.doPostForTestingInternal("C69DA9CEE58D8A7D");
+
+        api.runConsoleInterface();
+        /**
+         * /POST/"GUID" - Post the GUID into the local DB
+         * /GET/"GUID" - Get the GUID info in local DB
+         * /DELETE/"GUID" - Deletes the GUID from local DB
+         * /UPDATE/"GUID" => "name" - Updates the name of the camera owner in local DB.
+         *
+         */
 
     }
 }

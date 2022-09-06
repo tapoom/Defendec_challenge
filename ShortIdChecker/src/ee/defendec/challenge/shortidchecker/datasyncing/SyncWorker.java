@@ -15,8 +15,14 @@ public class SyncWorker implements Runnable{
     private static HashMap<String, Camera> externalDBDeviceMap = new HashMap<>();
 
     private boolean running;
+    private static boolean postUpdateMessages = false;
+    private static double updateIntervalInSeconds;
 
-    public synchronized void start() {
+
+
+    public synchronized void start(double updateIntervalInSeconds, boolean postUpdateMessages) {
+        this.updateIntervalInSeconds =  updateIntervalInSeconds;
+        this.postUpdateMessages = postUpdateMessages;
         this.running = true;
         final Thread thread = new Thread(this);
         thread.start();
@@ -35,6 +41,9 @@ public class SyncWorker implements Runnable{
      */
     private static void fetchExternalDevices() {
         externalDBDeviceMap = CameraMapper.getCameraMap(getDatabaseLocation());
+        for (Camera camera : externalDBDeviceMap.values()) {
+            camera.setInExternalDB();
+        }
     }
 
     /**
@@ -59,42 +68,54 @@ public class SyncWorker implements Runnable{
      * When the local database is synced to the external database, sync the external database to the local database.
      */
     private static void update() {
-        System.out.println("Updating DBs");
+        if (postUpdateMessages) {
+            System.out.println("Updating DBs");
+        }
         fetchExternalDevices();
-        for (String shortIDinLocal : localDBDevicesMap.keySet()) {
-            Camera localDBCamera = localDBDevicesMap.get(shortIDinLocal);
-            if (externalDBDeviceMap.containsKey(shortIDinLocal)) {
+        for (String GUIDInLocal : localDBDevicesMap.keySet()) {
+            Camera localDBCamera = localDBDevicesMap.get(GUIDInLocal);
+            if (externalDBDeviceMap.containsKey(GUIDInLocal)) {
                 // Check if stored data is older
-                Camera externalDBCamera = externalDBDeviceMap.get(shortIDinLocal);
+                localDBCamera.setInExternalDB();
+                Camera externalDBCamera = externalDBDeviceMap.get(GUIDInLocal);
                 // If local DB camera does not have a name then check if the external DB has it. If it does then
                 // update it. If they both have a name then use the most recently updated camera name and assign it.
                 if (!localDBCamera.getCustomerName().isBlank() && !externalDBCamera.getCustomerName().isBlank()) {
-                    if (externalDBCamera.getLastModifiedDateTime().before(localDBCamera.getLastModifiedDateTime())) {
-                        localDBCamera.updateLastModified();
-                        externalDBDeviceMap.replace(shortIDinLocal, localDBCamera);
-                    } else {
-                        externalDBCamera.updateLastModified();
-                        localDBDevicesMap.replace(shortIDinLocal, externalDBCamera);
+                    if (!externalDBCamera.getLastModifiedString().equals(localDBCamera.getLastModifiedString())) {
+                        if (externalDBCamera.getLastModifiedDateTime().before(localDBCamera.getLastModifiedDateTime())) {
+                            localDBCamera.updateLastModified();
+                            externalDBDeviceMap.replace(GUIDInLocal, localDBCamera);
+                        } else if (localDBCamera.getLastModifiedDateTime()
+                                .before(externalDBCamera.getLastModifiedDateTime())) {
+                            externalDBCamera.updateLastModified();
+                            localDBDevicesMap.replace(GUIDInLocal, externalDBCamera);
+                        }
                     }
                 } else if (localDBCamera.getCustomerName().isBlank() && !externalDBCamera.getCustomerName().isBlank()) {
                     externalDBCamera.updateLastModified();
-                    localDBDevicesMap.replace(shortIDinLocal, externalDBCamera);
-                    System.out.println("<!-- Customer name of " + externalDBCamera.getGUID() +
-                            " updated in LOCAL DB to " + externalDBCamera.getCustomerName() + " -->");
+                    localDBDevicesMap.replace(GUIDInLocal, externalDBCamera);
+                    if (postUpdateMessages) {
+                        System.out.println("<!-- Customer name of " + externalDBCamera.getGUID() +
+                                " updated in LOCAL DB to " + externalDBCamera.getCustomerName() + " -->");
+                    }
                 } else if (!localDBCamera.getCustomerName().isBlank() && externalDBCamera.getCustomerName().isBlank()) {
                     localDBCamera.updateLastModified();
-                    externalDBDeviceMap.replace(shortIDinLocal, localDBCamera);
-                    System.out.println("<!-- Customer name of " + localDBCamera.getGUID() +
-                            " updated in EXTERNAL DB to " + localDBCamera.getCustomerName() + " -->");
+                    externalDBDeviceMap.replace(GUIDInLocal, localDBCamera);
+                    if (postUpdateMessages) {
+                        System.out.println("<!-- Customer name of " + localDBCamera.getGUID() +
+                                " updated in EXTERNAL DB to " + localDBCamera.getCustomerName() + " -->");
+                    }
                 }
             } else {
                 // Camera did not exist in the external storage
                 localDBCamera.setInExternalDB();
-                externalDBDeviceMap.put(shortIDinLocal, localDBCamera);
+                externalDBDeviceMap.put(GUIDInLocal, localDBCamera);
             }
         }
         storeDevicesInExternalDB(externalDBDeviceMap);
-        System.out.println("DBs updated");
+        if (postUpdateMessages) {
+            System.out.println("DBs updated");
+        }
     }
 
     public static HashMap<String, Camera> getExternalDBMap() {
@@ -105,7 +126,7 @@ public class SyncWorker implements Runnable{
     @Override
     public void run() {
         long pastTime = System.nanoTime();
-        double updatesPerSecond = 0.2;  // Update every 5 seconds
+        double updatesPerSecond = 1 / updateIntervalInSeconds;
         double ns = 1000000000 / updatesPerSecond;
         double delta = 0;
 

@@ -2,7 +2,6 @@ package ee.defendec.challenge.shortidchecker.devices;
 
 import ee.defendec.challenge.shortidchecker.setup.GeneralSetup;
 import ee.defendec.challenge.shortidchecker.tools.ShortIDGenerator;
-import jdk.swing.interop.SwingInterOpUtils;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ public class Camera {
 
     private static final String DATEFORMAT = GeneralSetup.DATEFORMAT;
 
-    private String customerName;
+    private String customerName = null;
     private String deviceGUID;
     private Date lastModified;
     private boolean inExternalDB;
@@ -60,6 +59,7 @@ public class Camera {
 
     public void updateCustomerName(String newCustomerName) {
         customerName = newCustomerName;
+        inExternalDB = false;
         updateLastModified();
 
     }
@@ -89,11 +89,10 @@ public class Camera {
 
     public String getPostMessage() {
         String endString = "";
-
-        if (!customerName.isBlank()) {
-            endString = "\n]\n}";
+        if (customerName.isBlank()) {
+            endString = "'seen', '" + getLastModifiedString() + "', 'external': " + inExternalDB + "}";
         } else {
-            endString = "'customer': '" + customerName + "', 'external': " + inExternalDB + "}";
+            endString = "'seen', '" + getLastModifiedString() + "', 'customer': '" + customerName + "', 'external': " + inExternalDB + "}";
         }
 
         if (conflictedCameras.isEmpty()) {
@@ -101,18 +100,9 @@ public class Camera {
         } else {
 
             return "=> { 'providedGUI': '" + deviceGUID + "', 'conflicts': [" +
-                    "\n" + getConflictedGUIDsString() + "\n" + endString;
+                    "\n" + getConflictedGUIDsString() + "\n], " + endString;
 
         }
-
-        /*
-        if (conflictedCameras.isEmpty()) {
-            return "=> { 'providedGUI': '" + deviceGUID + "', 'conflicts': [], 'external': " + inExternalDB + "}";
-        } else {
-            return "=> { 'providedGUI': '" + deviceGUID + "', 'conflicts': [" +
-                    "\n" + getConflictedGUIDsString() + "\n]\n}";
-        }
-         */
     }
 
     @Override
