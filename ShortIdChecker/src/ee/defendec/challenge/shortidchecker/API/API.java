@@ -93,10 +93,15 @@ public class API extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String GUID = request.getParameter("device");
-        if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
-            response.getOutputStream().println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
-        } else {
-            response.getOutputStream().println("{}");
+        try {
+            checkGUIDLength(GUID);
+            if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
+                response.getOutputStream().println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
+            } else {
+                response.getOutputStream().println("{}");
+            }
+        } catch (BadGUIDException badGUIDMessage) {
+            response.getOutputStream().println(badGUIDMessage.toString());
         }
     }
 
@@ -123,25 +128,30 @@ public class API extends HttpServlet {
         String GUID = request.getParameter("device");
         // Seems from the test example that we need to add a device even if it already exists in the local DB
         // I will not do this at the moment since it seems redundant.
-        if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
-            response.getOutputStream().println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
-        } else {
-            Camera newCamera = new Camera(GUID);
-            try {
-                checkGUIDLength(GUID);
+        try {
+            checkGUIDLength(GUID);
+            if (SyncWorker.getLocalDBDevicesMap().containsKey(GUID)) {
+                response.getOutputStream().println(SyncWorker.getLocalDBDevicesMap().get(GUID).getPostMessage());
+            } else {
+                Camera newCamera = new Camera(GUID);
                 try {
-                    ShortIDChecker.checkShortIDsAndUpdateLocalDB(newCamera);
-                    getLocalDBDevicesMap().put(newCamera.getGUID(), newCamera);
-                    if (!newCamera.getConflictedCameras().isEmpty()) {
-                        throw new ShortIDException(GUID, newCamera.getConflictedGUIDsString());
+                    checkGUIDLength(GUID);
+                    try {
+                        ShortIDChecker.checkShortIDsAndUpdateLocalDB(newCamera);
+                        getLocalDBDevicesMap().put(newCamera.getGUID(), newCamera);
+                        if (!newCamera.getConflictedCameras().isEmpty()) {
+                            throw new ShortIDException(GUID, newCamera.getConflictedGUIDsString());
+                        }
+                        response.getOutputStream().println(newCamera.getPostMessage());
+                    } catch (ShortIDException message) {
+                        response.getOutputStream().println(message.toString());
                     }
-                    response.getOutputStream().println(newCamera.getPostMessage());
-                } catch (ShortIDException message) {
-                    response.getOutputStream().println(message.toString());
+                } catch (BadGUIDException badGUIDMessage) {
+                    response.getOutputStream().println(badGUIDMessage.toString());
                 }
-            } catch (BadGUIDException badGUIDMessage) {
-                response.getOutputStream().println(badGUIDMessage.toString());
             }
+        } catch (BadGUIDException badGUIDMessage) {
+            response.getOutputStream().println(badGUIDMessage.toString());
         }
     }
 
